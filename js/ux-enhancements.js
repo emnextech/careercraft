@@ -31,7 +31,8 @@ class UXEnhancements {
             this.setupConfirmationDialogs();
             // Removed setupLoadingSkeletons() - preview updates should be instant/live
             this.setupEmptyStates();
-            this.setupOnboardingTour();
+            // Tutorial/onboarding tour disabled
+            // this.setupOnboardingTour();
             // Removed setupHelpModal() - help button removed per user request
             this.setupKeyboardShortcuts();
             this.setupExampleData();
