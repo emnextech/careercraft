@@ -215,17 +215,22 @@ class DOCXExporter {
             margin-bottom: 15pt; 
             text-align: left;
         }
-        .preview-skills { 
+        .preview-skills-horizontal { 
             margin-top: 5pt; 
-            text-align: left;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4pt 8pt;
         }
         .preview-skill-item { 
-            display: inline-block; 
-            margin-right: 10pt; 
-            background: ${settings.accentColor};
-            color: white;
-            padding: 2pt 6pt;
-            border-radius: 8pt;
+            display: inline; 
+            color: #334155;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+        }
+        .skill-separator {
+            color: #64748B;
+            margin: 0 4pt;
         }
         /* Tables must not exceed printable area - stay within margins */
         .preview-education-table, table { 
@@ -465,13 +470,23 @@ ${content.innerHTML}
                 margin-bottom: 15pt; 
                 text-align: left;
             }
+            .preview-skills-horizontal {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4pt 8pt;
+            }
             .preview-skill-item {
-                background: ${settings.accentColor};
-                color: white;
-                padding: 2pt 6pt;
-                border-radius: 8pt;
-                display: inline-block;
-                margin-right: 6pt;
+                display: inline;
+                color: #334155;
+                padding: 0;
+                background: transparent;
+                border-radius: 0;
+                margin-right: 0;
+            }
+            .skill-separator {
+                color: #64748B;
+                margin: 0 4pt;
+            }
             }
             /* Tables must not exceed printable area - stay within margins */
             .preview-education-table, table { 

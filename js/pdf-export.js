@@ -254,18 +254,36 @@ class PDFExporter {
                     }
                     
                     yPos += 3;
-                } else if (currentElement.classList.contains('preview-skills')) {
+                } else if (currentElement.classList.contains('preview-skills-horizontal')) {
                     checkPageBreak(10);
                     const skillItems = currentElement.querySelectorAll('.preview-skill-item');
-                    let skillText = '';
-                    skillItems.forEach((item, index) => {
-                        if (index > 0) skillText += ', ';
-                        skillText += item.textContent.trim();
-                    });
                     doc.setFontSize(10);
-                    const skillLines = doc.splitTextToSize(skillText, maxWidth);
-                    doc.text(skillLines, contentStartX, yPos);
-                    yPos += skillLines.length * 5 + 5;
+                    let currentX = contentStartX;
+                    let lineY = yPos;
+                    let lineHeight = 6;
+                    
+                    skillItems.forEach((item, index) => {
+                        const skillText = item.textContent.trim();
+                        // Estimate width (approximate: 1mm per character for font size 10)
+                        const skillWidth = skillText.length * 1.2;
+                        
+                        // Check if skill fits on current line, otherwise move to next line
+                        if (currentX + skillWidth > contentStartX + maxWidth - 10 && currentX > contentStartX) {
+                            lineY += lineHeight;
+                            currentX = contentStartX;
+                            checkPageBreak(lineHeight);
+                        }
+                        
+                        doc.text(skillText, currentX, lineY);
+                        // Add spacing between skills (skip separator if present)
+                        const separator = item.nextElementSibling;
+                        if (separator && separator.classList.contains('skill-separator')) {
+                            currentX += skillWidth + 3; // Smaller spacing with separator
+                        } else {
+                            currentX += skillWidth + 5; // Normal spacing
+                        }
+                    });
+                    yPos = lineY + lineHeight + 3;
                 }
                 
                 currentElement = currentElement.nextElementSibling;

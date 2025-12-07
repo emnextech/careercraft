@@ -258,11 +258,39 @@ class BuilderEnhancements {
     }
 
     populateCVForm(data) {
-        // Single fields (excluding skills which is handled separately)
-        ['name', 'email', 'phone', 'address', 'website', 'summary'].forEach(field => {
+        // Single fields (excluding skills and address which are handled separately)
+        ['name', 'email', 'phone', 'summary'].forEach(field => {
             const el = document.getElementById(`cv-${field}`);
             if (el && data[field]) el.value = data[field];
         });
+
+        // Handle structured address
+        if (data.address && typeof data.address === 'object') {
+            const addr = data.address;
+            const countryInput = document.getElementById('cv-address-country');
+            const countrySearch = document.getElementById('cv-address-country-search');
+            const stateSelect = document.getElementById('cv-address-state');
+            const cityInput = document.getElementById('cv-address-city');
+            const streetInput = document.getElementById('cv-address-street');
+            
+            if (addr.country && countryInput && countrySearch && window.cvFormManager) {
+                countryInput.value = addr.country;
+                countrySearch.value = addr.country;
+                window.cvFormManager.updateAddressStateDropdown(addr.country);
+            }
+            if (addr.state && stateSelect) {
+                stateSelect.value = addr.state;
+            }
+            if (addr.city && cityInput) {
+                cityInput.value = addr.city;
+            }
+            if (addr.street && streetInput) {
+                streetInput.value = addr.street;
+            }
+            if (window.cvFormManager) {
+                window.cvFormManager.updateAddressData();
+            }
+        }
 
         // Handle skills array
         if (data.skills && Array.isArray(data.skills) && data.skills.length > 0) {

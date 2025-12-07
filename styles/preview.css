@@ -88,20 +88,24 @@
     line-height: var(--line-height-relaxed, 1.75);
 }
 
-.preview-content.template-modern .preview-skills {
+.preview-content.template-modern .preview-skills-horizontal {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    margin-top: var(--spacing-sm, 8px);
+    align-items: center;
 }
 
 .preview-content.template-modern .preview-skill-item {
-    background: var(--accent-color);
-    color: var(--text-on-dark, white);
-    padding: var(--spacing-xs, 4px) var(--spacing-md, 12px);
-    border-radius: 15px;
-    font-size: var(--font-size-sm, 0.875rem);
-    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-secondary, #334155);
+    font-size: var(--font-size-base, 1rem);
     line-height: var(--line-height-normal, 1.5);
+}
+
+.preview-content.template-modern .skill-separator {
+    color: var(--text-tertiary, #64748B);
+    font-size: var(--font-size-sm, 0.875rem);
+    margin: 0 var(--spacing-xs, 4px);
 }
 
 /* Classic Template */
@@ -171,6 +175,46 @@
     line-height: var(--line-height-relaxed, 1.75);
 }
 
+.preview-content.template-classic .preview-skills-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    margin-top: var(--spacing-sm, 8px);
+    align-items: center;
+}
+
+.preview-content.template-classic .preview-skill-item {
+    color: var(--text-secondary, #334155);
+    font-size: var(--font-size-base, 1rem);
+    line-height: var(--line-height-normal, 1.5);
+}
+
+.preview-content.template-classic .skill-separator {
+    color: var(--text-tertiary, #64748B);
+    font-size: var(--font-size-sm, 0.875rem);
+    margin: 0 var(--spacing-xs, 4px);
+}
+
+.preview-content.template-classic .preview-skills-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    margin-top: var(--spacing-sm, 8px);
+    align-items: center;
+}
+
+.preview-content.template-classic .preview-skill-item {
+    color: var(--text-secondary, #334155);
+    font-size: var(--font-size-base, 1rem);
+    line-height: var(--line-height-normal, 1.5);
+}
+
+.preview-content.template-classic .skill-separator {
+    color: var(--text-tertiary, #64748B);
+    font-size: var(--font-size-sm, 0.875rem);
+    margin: 0 var(--spacing-xs, 4px);
+}
+
 /* Bold Template */
 .preview-content.template-bold {
     font-family: 'Arial Black', Arial, sans-serif;
@@ -238,6 +282,26 @@
     color: var(--text-secondary, #334155);
     font-size: var(--font-size-base, 1rem);
     line-height: var(--line-height-relaxed, 1.75);
+}
+
+.preview-content.template-bold .preview-skills-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    margin-top: var(--spacing-sm, 8px);
+    align-items: center;
+}
+
+.preview-content.template-bold .preview-skill-item {
+    color: var(--text-secondary, #334155);
+    font-size: var(--font-size-base, 1rem);
+    line-height: var(--line-height-normal, 1.5);
+}
+
+.preview-content.template-bold .skill-separator {
+    color: var(--text-tertiary, #64748B);
+    font-size: var(--font-size-sm, 0.875rem);
+    margin: 0 var(--spacing-xs, 4px);
 }
 
 /* Common Preview Styles */

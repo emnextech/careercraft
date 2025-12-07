@@ -89,9 +89,60 @@
                         <h3>Personal Information</h3>
                         <input type="text" id="cv-name" placeholder="e.g., John Banda" data-field="name">
                         <input type="email" id="cv-email" placeholder="e.g., john.banda@email.com" data-field="email">
-                        <input type="tel" id="cv-phone" placeholder="e.g., +123 456 7890" data-field="phone">
-                        <input type="text" id="cv-address" placeholder="e.g., 123 Main St, City, Country" data-field="address">
-                        <input type="url" id="cv-website" placeholder="e.g., https://www.linkedin.com/in/johnbanda" data-field="website">
+                        <div class="phone-input-group">
+                            <label for="cv-country-code" class="form-label">Phone Number</label>
+                            <div class="phone-input-wrapper">
+                            <div class="country-select-wrapper">
+                                <div class="country-select-input" id="cv-country-code-display">
+                                        <input type="text" id="cv-country-code-search" placeholder="Select country..." autocomplete="off" aria-label="Select country code">
+                                    <span class="country-select-arrow">▼</span>
+                                </div>
+                                    <div class="country-select-dropdown" id="cv-country-code-dropdown" style="display: none;" role="listbox">
+                                        <div class="country-select-list" id="cv-country-code-list" role="list">
+                                        <!-- Countries will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                                <input type="hidden" id="cv-country-code" value="">
+                            </div>
+                                <input type="tel" id="cv-phone-number" placeholder="Enter phone number" data-field="phone-number" class="phone-number-input" aria-label="Phone number">
+                            </div>
+                        </div>
+                        <input type="hidden" id="cv-phone" data-field="phone">
+                        
+                        <!-- Address Section -->
+                        <div class="address-input-group">
+                            <label for="cv-address-country" class="form-label">Address</label>
+                            
+                            <!-- Country Selection -->
+                            <div class="country-select-wrapper">
+                                <div class="country-select-input" id="cv-address-country-display">
+                                    <input type="text" id="cv-address-country-search" placeholder="Select country..." autocomplete="off" aria-label="Select country">
+                                    <span class="country-select-arrow">▼</span>
+                                </div>
+                                <div class="country-select-dropdown" id="cv-address-country-dropdown" style="display: none;" role="listbox">
+                                    <div class="country-select-list" id="cv-address-country-list" role="list">
+                                        <!-- Countries will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                                <input type="hidden" id="cv-address-country" value="">
+                            </div>
+                            
+                            <!-- State/Province Selection (conditional) -->
+                            <div id="cv-address-state-wrapper" class="address-state-wrapper" style="display: none;">
+                                <label for="cv-address-state" class="form-label">State/Province/Region</label>
+                                <select id="cv-address-state" class="form-select" data-field="address-state">
+                                    <option value="">-- Select State/Province --</option>
+                                </select>
+                            </div>
+                            
+                            <!-- City -->
+                            <label for="cv-address-city" class="form-label">City</label>
+                            <input type="text" id="cv-address-city" placeholder="Enter city" data-field="address-city" class="address-city-input">
+                            
+                            <!-- Street Address (Optional) -->
+                            <label for="cv-address-street" class="form-label">Street Address <span class="optional-label">(Optional)</span></label>
+                            <input type="text" id="cv-address-street" placeholder="Enter street address (optional)" data-field="address-street" class="address-street-input">
+                        </div>
                     </div>
 
                     <!-- Professional Summary -->
@@ -216,9 +267,10 @@
                     <!-- Skills -->
                     <div class="form-group" id="cv-skills-section">
                         <h3>Skills</h3>
-                        <label for="cv-industry-select" class="form-label">Select Industry</label>
+                        <p class="form-instruction">Select your industry to see relevant skills, or type your skills manually separated by commas.</p>
+                        <label for="cv-industry-select" class="form-label">Industry (Optional)</label>
                         <select id="cv-industry-select" class="form-select">
-                            <option value="">-- Select an Industry --</option>
+                            <option value="">Select an industry (optional)</option>
                             <option value="it">IT</option>
                             <option value="business">Business</option>
                             <option value="education">Education</option>
@@ -227,17 +279,13 @@
                             <option value="hospitality">Hospitality</option>
                         </select>
                         <div id="cv-skills-container" class="skills-checkbox-container" style="display: none;">
-                            <label class="form-label">Select Your Skills</label>
                             <div id="cv-skills-checkboxes" class="skills-checkboxes">
                                 <!-- Skills checkboxes will be dynamically generated here -->
                             </div>
                         </div>
-                        <div id="cv-selected-skills-display" class="selected-skills-display" style="display: none;">
-                            <label class="form-label">Selected Skills</label>
-                            <div id="cv-selected-skills-list" class="selected-skills-list">
-                                <!-- Selected skills will be displayed here -->
-                            </div>
-                        </div>
+                        <label for="cv-skills-manual" class="form-label">Or Enter Skills Manually</label>
+                        <input type="text" id="cv-skills-manual" placeholder="e.g., Python, JavaScript, Project Management" data-field="skills-manual" class="skills-manual-input">
+                        <p class="form-hint">Separate multiple skills with commas</p>
                     </div>
 
                     <!-- References -->
@@ -306,6 +354,7 @@
     </div>
 
     <script src="js/main.js"></script>
+    <script src="js/country-codes.js"></script>
     <script src="js/builder-init.js"></script>
     <script src="js/cv-form.js"></script>
     <script src="js/preview.js"></script>

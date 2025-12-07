@@ -55,8 +55,12 @@ class PreviewManager {
                 name: 'John Banda',
                 email: 'john.banda@email.com',
                 phone: '+123 456 7890',
-                address: '123 Main St, City, Country',
-                website: 'www.johnbanda.com',
+                address: {
+                    country: 'Zambia',
+                    state: 'Lusaka',
+                    city: 'Lusaka',
+                    street: '123 Main Street'
+                },
                 summary: 'Motivated IT specialist with 4+ years of experience in software development and system administration. Proven track record of delivering high-quality solutions and leading cross-functional teams.',
                 education: [
                     { year: '2015-2017', level: 'Tertiary', school: 'Rockview University', qualification: 'Diploma in Computer Science' },
@@ -103,6 +107,24 @@ class PreviewManager {
                 return Array.isArray(placeholderData[field]) ? placeholderData[field] : [];
             }
             return [];
+        }
+        
+        // Special handling for address object
+        if (field === 'address') {
+            if (value && typeof value === 'object' && !Array.isArray(value)) {
+                // Check if address object has any non-empty values
+                const hasValue = Object.values(value).some(v => v && v.trim && v.trim() !== '');
+                if (hasValue) {
+                    return value;
+                }
+            } else if (value && typeof value === 'string' && value.trim() !== '') {
+                // Legacy string format
+                return value;
+            }
+            if (isPlaceholder) {
+                return placeholderData[field] || (typeof placeholderData[field] === 'object' ? {} : '');
+            }
+            return typeof value === 'object' ? {} : '';
         }
         
         const isEmpty = this.isFieldEmpty(value);
@@ -205,10 +227,25 @@ class PreviewManager {
         const name = this.getValue('name', data, placeholderData, true);
         const email = this.getValue('email', data, placeholderData, true);
         const phone = this.getValue('phone', data, placeholderData, true);
-        const address = this.getValue('address', data, placeholderData, true);
-        const website = this.getValue('website', data, placeholderData, true);
+        const addressData = this.getValue('address', data, placeholderData, true);
         const summary = this.getValue('summary', data, placeholderData, true);
         const skills = this.getValue('skills', data, placeholderData, true);
+
+        // Format address for display
+        const formatAddress = (addr) => {
+            if (!addr) return '';
+            if (typeof addr === 'string') return addr; // Legacy format
+            
+            const parts = [];
+            if (addr.street) parts.push(addr.street);
+            if (addr.city) parts.push(addr.city);
+            if (addr.state) parts.push(addr.state);
+            if (addr.country) parts.push(addr.country);
+            
+            return parts.join(', ');
+        };
+
+        const address = formatAddress(addressData);
 
         let html = `
             <div class="preview-header-section">
@@ -216,8 +253,7 @@ class PreviewManager {
                 <div class="preview-contact">
                     ${email ? this.escapeHtml(email) + ' • ' : ''}
                     ${phone ? this.escapeHtml(phone) + ' • ' : ''}
-                    ${this.escapeHtml(address || '')}
-                    ${website ? ' • ' + this.escapeHtml(website) : ''}
+                    ${address ? this.escapeHtml(address) : ''}
                 </div>
             </div>
         `;
@@ -363,9 +399,12 @@ class PreviewManager {
                 : skills.split(/[,\n]/).map(s => s.trim()).filter(s => s);
             
             if (skillsArray.length > 0) {
-                html += '<div class="preview-skills">';
-                skillsArray.forEach(skill => {
+                html += '<div class="preview-skills-horizontal">';
+                skillsArray.forEach((skill, index) => {
                     html += `<span class="preview-skill-item">${this.escapeHtml(skill)}</span>`;
+                    if (index < skillsArray.length - 1) {
+                        html += '<span class="skill-separator">•</span>';
+                    }
                 });
                 html += '</div>';
             }

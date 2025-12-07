@@ -4,7 +4,514 @@ class CVFormManager {
         this.data = this.getDefaultData();
         this.selectedIndustry = '';
         this.selectedSkills = [];
+        this.countryCode = '';
+        this.phoneNumber = '';
         this.init();
+    }
+
+    // Country code data with validation rules
+    getCountryCodeData() {
+        return {
+            '+260': { country: 'Zambia', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+27': { country: 'South Africa', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+254': { country: 'Kenya', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+255': { country: 'Tanzania', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+256': { country: 'Uganda', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+234': { country: 'Nigeria', minLength: 10, maxLength: 10, pattern: /^[0-9]{10}$/ },
+            '+233': { country: 'Ghana', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+1': { country: 'USA/Canada', minLength: 10, maxLength: 10, pattern: /^[0-9]{10}$/ },
+            '+44': { country: 'United Kingdom', minLength: 10, maxLength: 10, pattern: /^[0-9]{10}$/ },
+            '+33': { country: 'France', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+49': { country: 'Germany', minLength: 10, maxLength: 11, pattern: /^[0-9]{10,11}$/ },
+            '+86': { country: 'China', minLength: 11, maxLength: 11, pattern: /^[0-9]{11}$/ },
+            '+91': { country: 'India', minLength: 10, maxLength: 10, pattern: /^[0-9]{10}$/ },
+            '+81': { country: 'Japan', minLength: 10, maxLength: 11, pattern: /^[0-9]{10,11}$/ },
+            '+61': { country: 'Australia', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+55': { country: 'Brazil', minLength: 10, maxLength: 11, pattern: /^[0-9]{10,11}$/ },
+            '+52': { country: 'Mexico', minLength: 10, maxLength: 10, pattern: /^[0-9]{10}$/ },
+            '+7': { country: 'Russia', minLength: 10, maxLength: 10, pattern: /^[0-9]{10}$/ },
+            '+39': { country: 'Italy', minLength: 9, maxLength: 10, pattern: /^[0-9]{9,10}$/ },
+            '+34': { country: 'Spain', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+31': { country: 'Netherlands', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+46': { country: 'Sweden', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+47': { country: 'Norway', minLength: 8, maxLength: 8, pattern: /^[0-9]{8}$/ },
+            '+41': { country: 'Switzerland', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+32': { country: 'Belgium', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+351': { country: 'Portugal', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+353': { country: 'Ireland', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+358': { country: 'Finland', minLength: 9, maxLength: 10, pattern: /^[0-9]{9,10}$/ },
+            '+45': { country: 'Denmark', minLength: 8, maxLength: 8, pattern: /^[0-9]{8}$/ },
+            '+64': { country: 'New Zealand', minLength: 8, maxLength: 9, pattern: /^[0-9]{8,9}$/ },
+            '+82': { country: 'South Korea', minLength: 9, maxLength: 10, pattern: /^[0-9]{9,10}$/ },
+            '+65': { country: 'Singapore', minLength: 8, maxLength: 8, pattern: /^[0-9]{8}$/ },
+            '+60': { country: 'Malaysia', minLength: 9, maxLength: 10, pattern: /^[0-9]{9,10}$/ },
+            '+66': { country: 'Thailand', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+84': { country: 'Vietnam', minLength: 9, maxLength: 10, pattern: /^[0-9]{9,10}$/ },
+            '+62': { country: 'Indonesia', minLength: 9, maxLength: 11, pattern: /^[0-9]{9,11}$/ },
+            '+63': { country: 'Philippines', minLength: 10, maxLength: 10, pattern: /^[0-9]{10}$/ },
+            '+971': { country: 'UAE', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+966': { country: 'Saudi Arabia', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ },
+            '+20': { country: 'Egypt', minLength: 10, maxLength: 10, pattern: /^[0-9]{10}$/ },
+            '+212': { country: 'Morocco', minLength: 9, maxLength: 9, pattern: /^[0-9]{9}$/ }
+        };
+    }
+
+    // Format phone number with country code
+    formatPhoneNumber(countryCode, phoneNumber) {
+        if (!countryCode || !phoneNumber) return '';
+        // Remove any spaces or dashes from phone number
+        const cleaned = phoneNumber.replace(/[\s-]/g, '');
+        // Format as: +260 976 123 456
+        if (cleaned.length > 0) {
+            // Add spaces every 3 digits for better readability
+            const formatted = cleaned.match(/.{1,3}/g)?.join(' ') || cleaned;
+            return `${countryCode} ${formatted}`;
+        }
+        return '';
+    }
+
+    // Validate phone number based on country code
+    validatePhoneNumber(countryCode, phoneNumber) {
+        if (!countryCode || !phoneNumber) return { valid: false, message: '' };
+        
+        const cleaned = phoneNumber.replace(/[\s-]/g, '');
+        const countryData = this.getCountryCodeData()[countryCode];
+        
+        if (!countryData) return { valid: true, message: '' }; // No validation if country not in list
+        
+        if (cleaned.length < countryData.minLength) {
+            return { 
+                valid: false, 
+                message: `Phone number must be at least ${countryData.minLength} digits for ${countryData.country}` 
+            };
+        }
+        
+        if (cleaned.length > countryData.maxLength) {
+            return { 
+                valid: false, 
+                message: `Phone number must be at most ${countryData.maxLength} digits for ${countryData.country}` 
+            };
+        }
+        
+        if (!countryData.pattern.test(cleaned)) {
+            return { 
+                valid: false, 
+                message: `Invalid phone number format for ${countryData.country}` 
+            };
+        }
+        
+        return { valid: true, message: '' };
+    }
+
+    // Update phone display and data
+    updatePhoneDisplay() {
+        const countryCodeInput = document.getElementById('cv-country-code');
+        const phoneNumberInput = document.getElementById('cv-phone-number');
+        const hiddenPhone = document.getElementById('cv-phone');
+        
+        if (!countryCodeInput || !phoneNumberInput) return;
+        
+        this.countryCode = countryCodeInput.value;
+        this.phoneNumber = phoneNumberInput.value.trim();
+        
+        if (this.countryCode && this.phoneNumber) {
+            const formatted = this.formatPhoneNumber(this.countryCode, this.phoneNumber);
+            const validation = this.validatePhoneNumber(this.countryCode, this.phoneNumber);
+            
+            // Update hidden field with formatted phone
+            if (hiddenPhone) {
+                hiddenPhone.value = formatted;
+                this.data.phone = formatted;
+            }
+            
+            // Show validation message if invalid
+            if (!validation.valid && phoneNumberInput) {
+                phoneNumberInput.setCustomValidity(validation.message);
+                phoneNumberInput.style.borderColor = '#EF4444';
+            } else if (phoneNumberInput) {
+                phoneNumberInput.setCustomValidity('');
+                phoneNumberInput.style.borderColor = '';
+            }
+        } else {
+            if (hiddenPhone) {
+                hiddenPhone.value = '';
+                this.data.phone = '';
+            }
+            if (phoneNumberInput) {
+                phoneNumberInput.setCustomValidity('');
+                phoneNumberInput.style.borderColor = '';
+            }
+        }
+        
+        // Update preview
+        if (window.previewManager) {
+            window.previewManager.updatePreview();
+        }
+    }
+
+    // Initialize phone number handler
+    initPhoneHandler() {
+        this.initCountryCodeDropdown();
+        const phoneNumberInput = document.getElementById('cv-phone-number');
+        
+        if (phoneNumberInput) {
+            phoneNumberInput.addEventListener('input', () => {
+                // Only allow digits, spaces, and dashes
+                phoneNumberInput.value = phoneNumberInput.value.replace(/[^\d\s-]/g, '');
+                this.updatePhoneDisplay();
+            });
+            
+            phoneNumberInput.addEventListener('blur', () => {
+                this.updatePhoneDisplay();
+            });
+        }
+    }
+
+    // Initialize searchable country code dropdown
+    initCountryCodeDropdown() {
+        const searchInput = document.getElementById('cv-country-code-search');
+        const dropdown = document.getElementById('cv-country-code-dropdown');
+        const list = document.getElementById('cv-country-code-list');
+        const hiddenInput = document.getElementById('cv-country-code');
+        const displayInput = document.getElementById('cv-country-code-display');
+        
+        if (!searchInput || !dropdown || !list || !hiddenInput) return;
+
+        // Populate country list
+        this.populateCountryList(list);
+
+        // Track selected index for keyboard navigation
+        let selectedIndex = -1;
+
+        // Toggle dropdown
+        const showDropdown = () => {
+            dropdown.style.display = 'block';
+            this.filterCountries('');
+            selectedIndex = -1;
+            searchInput.focus();
+        };
+
+        const hideDropdown = () => {
+            dropdown.style.display = 'none';
+            selectedIndex = -1;
+        };
+
+        searchInput.addEventListener('focus', showDropdown);
+        searchInput.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (dropdown.style.display === 'none') {
+                showDropdown();
+            }
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            this.filterCountries(e.target.value);
+            selectedIndex = -1;
+        });
+
+        // Keyboard navigation
+        searchInput.addEventListener('keydown', (e) => {
+            const items = list.querySelectorAll('.country-item:not([style*="display: none"])');
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                this.highlightCountryItem(items, selectedIndex);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = Math.max(selectedIndex - 1, -1);
+                this.highlightCountryItem(items, selectedIndex);
+            } else if (e.key === 'Enter' && selectedIndex >= 0 && items[selectedIndex]) {
+                e.preventDefault();
+                items[selectedIndex].click();
+            } else if (e.key === 'Escape') {
+                hideDropdown();
+                searchInput.blur();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!displayInput.contains(e.target) && !dropdown.contains(e.target)) {
+                hideDropdown();
+            }
+        });
+
+        // Handle country selection
+        list.addEventListener('click', (e) => {
+            const countryItem = e.target.closest('.country-item');
+            if (countryItem) {
+                const code = countryItem.getAttribute('data-code');
+                const country = countryItem.getAttribute('data-country');
+                hiddenInput.value = code;
+                searchInput.value = `${country} (${code})`;
+                hideDropdown();
+                this.countryCode = code;
+                this.updatePhoneDisplay();
+                // Move focus to phone number input for better UX
+                const phoneInput = document.getElementById('cv-phone-number');
+                if (phoneInput) {
+                    setTimeout(() => phoneInput.focus(), 100);
+                }
+            }
+        });
+    }
+
+    // Highlight country item for keyboard navigation
+    highlightCountryItem(items, index) {
+        items.forEach((item, i) => {
+            if (i === index) {
+                item.setAttribute('aria-selected', 'true');
+                item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            } else {
+                item.setAttribute('aria-selected', 'false');
+            }
+        });
+    }
+
+    // Populate country list
+    populateCountryList(list) {
+        if (typeof COUNTRY_CODES === 'undefined') {
+            console.error('COUNTRY_CODES not loaded');
+            return;
+        }
+        
+        list.innerHTML = '';
+        COUNTRY_CODES.forEach((country, index) => {
+            const item = document.createElement('div');
+            item.className = 'country-item';
+            item.setAttribute('data-code', country.code);
+            item.setAttribute('data-country', country.country);
+            item.setAttribute('role', 'option');
+            item.setAttribute('aria-selected', 'false');
+            item.setAttribute('tabindex', '-1');
+            item.innerHTML = `<span class="country-name">${country.country}</span><span class="country-code">${country.code}</span>`;
+            list.appendChild(item);
+        });
+    }
+
+    // Filter countries based on search
+    filterCountries(searchTerm) {
+        const list = document.getElementById('cv-country-code-list');
+        if (!list) return;
+        
+        const items = list.querySelectorAll('.country-item');
+        const term = searchTerm.toLowerCase().trim();
+        
+        items.forEach(item => {
+            const country = item.getAttribute('data-country').toLowerCase();
+            const code = item.getAttribute('data-code');
+            if (country.includes(term) || code.includes(term)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // Initialize address handler
+    initAddressHandler() {
+        this.initAddressCountryDropdown();
+        this.bindAddressInputs();
+    }
+
+    // Initialize address country dropdown
+    initAddressCountryDropdown() {
+        const searchInput = document.getElementById('cv-address-country-search');
+        const dropdown = document.getElementById('cv-address-country-dropdown');
+        const list = document.getElementById('cv-address-country-list');
+        const hiddenInput = document.getElementById('cv-address-country');
+        const displayInput = document.getElementById('cv-address-country-display');
+        
+        if (!searchInput || !dropdown || !list || !hiddenInput) return;
+
+        // Populate country list (use same COUNTRY_CODES as phone)
+        this.populateAddressCountryList(list);
+
+        let selectedIndex = -1;
+
+        const showDropdown = () => {
+            dropdown.style.display = 'block';
+            this.filterAddressCountries('');
+            selectedIndex = -1;
+            searchInput.focus();
+        };
+
+        const hideDropdown = () => {
+            dropdown.style.display = 'none';
+            selectedIndex = -1;
+        };
+
+        searchInput.addEventListener('focus', showDropdown);
+        searchInput.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (dropdown.style.display === 'none') {
+                showDropdown();
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            this.filterAddressCountries(e.target.value);
+            selectedIndex = -1;
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            const items = list.querySelectorAll('.country-item:not([style*="display: none"])');
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                this.highlightAddressCountryItem(items, selectedIndex);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = Math.max(selectedIndex - 1, -1);
+                this.highlightAddressCountryItem(items, selectedIndex);
+            } else if (e.key === 'Enter' && selectedIndex >= 0 && items[selectedIndex]) {
+                e.preventDefault();
+                items[selectedIndex].click();
+            } else if (e.key === 'Escape') {
+                hideDropdown();
+                searchInput.blur();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!displayInput.contains(e.target) && !dropdown.contains(e.target)) {
+                hideDropdown();
+            }
+        });
+
+        list.addEventListener('click', (e) => {
+            const countryItem = e.target.closest('.country-item');
+            if (countryItem) {
+                const country = countryItem.getAttribute('data-country');
+                hiddenInput.value = country;
+                searchInput.value = country;
+                hideDropdown();
+                this.updateAddressStateDropdown(country);
+                this.updateAddressData();
+            }
+        });
+    }
+
+    // Populate address country list
+    populateAddressCountryList(list) {
+        if (typeof COUNTRY_CODES === 'undefined') {
+            console.error('COUNTRY_CODES not loaded');
+            return;
+        }
+        
+        list.innerHTML = '';
+        COUNTRY_CODES.forEach((country, index) => {
+            const item = document.createElement('div');
+            item.className = 'country-item';
+            item.setAttribute('data-country', country.country);
+            item.setAttribute('role', 'option');
+            item.setAttribute('aria-selected', 'false');
+            item.setAttribute('tabindex', '-1');
+            item.innerHTML = `<span class="country-name">${country.country}</span>`;
+            list.appendChild(item);
+        });
+    }
+
+    // Filter address countries
+    filterAddressCountries(searchTerm) {
+        const list = document.getElementById('cv-address-country-list');
+        if (!list) return;
+        
+        const items = list.querySelectorAll('.country-item');
+        const term = searchTerm.toLowerCase().trim();
+        
+        items.forEach(item => {
+            const country = item.getAttribute('data-country').toLowerCase();
+            if (country.includes(term)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // Highlight address country item
+    highlightAddressCountryItem(items, index) {
+        items.forEach((item, i) => {
+            if (i === index) {
+                item.setAttribute('aria-selected', 'true');
+                item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            } else {
+                item.setAttribute('aria-selected', 'false');
+            }
+        });
+    }
+
+    // Update state/province dropdown based on country
+    updateAddressStateDropdown(countryName) {
+        const stateWrapper = document.getElementById('cv-address-state-wrapper');
+        const stateSelect = document.getElementById('cv-address-state');
+        
+        if (!stateWrapper || !stateSelect) return;
+
+        if (this.hasStatesProvinces(countryName)) {
+            const states = this.getStatesForCountry(countryName);
+            stateSelect.innerHTML = '<option value="">-- Select State/Province --</option>';
+            states.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateSelect.appendChild(option);
+            });
+            stateWrapper.style.display = 'block';
+        } else {
+            stateWrapper.style.display = 'none';
+            stateSelect.value = '';
+        }
+    }
+
+    // Bind address input events
+    bindAddressInputs() {
+        const stateSelect = document.getElementById('cv-address-state');
+        const cityInput = document.getElementById('cv-address-city');
+        const streetInput = document.getElementById('cv-address-street');
+
+        if (stateSelect) {
+            stateSelect.addEventListener('change', () => {
+                this.updateAddressData();
+            });
+        }
+
+        if (cityInput) {
+            cityInput.addEventListener('input', () => {
+                this.updateAddressData();
+            });
+        }
+
+        if (streetInput) {
+            streetInput.addEventListener('input', () => {
+                this.updateAddressData();
+            });
+        }
+    }
+
+    // Update address data object
+    updateAddressData() {
+        const countryInput = document.getElementById('cv-address-country');
+        const stateSelect = document.getElementById('cv-address-state');
+        const cityInput = document.getElementById('cv-address-city');
+        const streetInput = document.getElementById('cv-address-street');
+
+        if (!this.data.address) {
+            this.data.address = { country: '', state: '', city: '', street: '' };
+        }
+
+        this.data.address.country = countryInput ? countryInput.value : '';
+        this.data.address.state = stateSelect ? stateSelect.value : '';
+        this.data.address.city = cityInput ? cityInput.value.trim() : '';
+        this.data.address.street = streetInput ? streetInput.value.trim() : '';
+
+        if (window.previewManager) {
+            window.previewManager.updatePreview();
+        }
     }
 
     // Industry-specific skills data
@@ -61,13 +568,48 @@ class CVFormManager {
         };
     }
 
+    // States/Provinces data for major countries
+    getStatesProvinces() {
+        return {
+            'United States': ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'],
+            'Canada': ['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia', 'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon'],
+            'Australia': ['Australian Capital Territory', 'New South Wales', 'Northern Territory', 'Queensland', 'South Australia', 'Tasmania', 'Victoria', 'Western Australia'],
+            'India': ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'],
+            'United Kingdom': ['England', 'Scotland', 'Wales', 'Northern Ireland'],
+            'Germany': ['Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hesse', 'Lower Saxony', 'Mecklenburg-Vorpommern', 'North Rhine-Westphalia', 'Rhineland-Palatinate', 'Saarland', 'Saxony', 'Saxony-Anhalt', 'Schleswig-Holstein', 'Thuringia'],
+            'Brazil': ['Acre', 'Alagoas', 'Amapá', 'Amazonas', 'Bahia', 'Ceará', 'Distrito Federal', 'Espírito Santo', 'Goiás', 'Maranhão', 'Mato Grosso', 'Mato Grosso do Sul', 'Minas Gerais', 'Pará', 'Paraíba', 'Paraná', 'Pernambuco', 'Piauí', 'Rio de Janeiro', 'Rio Grande do Norte', 'Rio Grande do Sul', 'Rondônia', 'Roraima', 'Santa Catarina', 'São Paulo', 'Sergipe', 'Tocantins'],
+            'Mexico': ['Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas', 'Chihuahua', 'Coahuila', 'Colima', 'Durango', 'Guanajuato', 'Guerrero', 'Hidalgo', 'Jalisco', 'México', 'Michoacán', 'Morelos', 'Nayarit', 'Nuevo León', 'Oaxaca', 'Puebla', 'Querétaro', 'Quintana Roo', 'San Luis Potosí', 'Sinaloa', 'Sonora', 'Tabasco', 'Tamaulipas', 'Tlaxcala', 'Veracruz', 'Yucatán', 'Zacatecas'],
+            'China': ['Anhui', 'Beijing', 'Chongqing', 'Fujian', 'Gansu', 'Guangdong', 'Guangxi', 'Guizhou', 'Hainan', 'Hebei', 'Heilongjiang', 'Henan', 'Hong Kong', 'Hubei', 'Hunan', 'Inner Mongolia', 'Jiangsu', 'Jiangxi', 'Jilin', 'Liaoning', 'Macau', 'Ningxia', 'Qinghai', 'Shaanxi', 'Shandong', 'Shanghai', 'Shanxi', 'Sichuan', 'Tianjin', 'Tibet', 'Xinjiang', 'Yunnan', 'Zhejiang'],
+            'South Africa': ['Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal', 'Limpopo', 'Mpumalanga', 'Northern Cape', 'North West', 'Western Cape'],
+            'Nigeria': ['Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'],
+            'Kenya': ['Baringo', 'Bomet', 'Bungoma', 'Busia', 'Elgeyo-Marakwet', 'Embu', 'Garissa', 'Homa Bay', 'Isiolo', 'Kajiado', 'Kakamega', 'Kericho', 'Kiambu', 'Kilifi', 'Kirinyaga', 'Kisii', 'Kisumu', 'Kitui', 'Kwale', 'Laikipia', 'Lamu', 'Machakos', 'Makueni', 'Mandera', 'Marsabit', 'Meru', 'Migori', 'Mombasa', 'Murang\'a', 'Nairobi', 'Nakuru', 'Nandi', 'Narok', 'Nyamira', 'Nyandarua', 'Nyeri', 'Samburu', 'Siaya', 'Taita-Taveta', 'Tana River', 'Tharaka-Nithi', 'Trans Nzoia', 'Turkana', 'Uasin Gishu', 'Vihiga', 'Wajir', 'West Pokot'],
+            'Zambia': ['Central', 'Copperbelt', 'Eastern', 'Luapula', 'Lusaka', 'Muchinga', 'Northern', 'North-Western', 'Southern', 'Western']
+        };
+    }
+
+    // Check if country has states/provinces
+    hasStatesProvinces(countryName) {
+        const states = this.getStatesProvinces();
+        return states.hasOwnProperty(countryName);
+    }
+
+    // Get states/provinces for a country
+    getStatesForCountry(countryName) {
+        const states = this.getStatesProvinces();
+        return states[countryName] || [];
+    }
+
     getDefaultData() {
         return {
             name: '',
             email: '',
             phone: '',
-            address: '',
-            website: '',
+            address: {
+                country: '',
+                state: '',
+                city: '',
+                street: ''
+            },
             summary: '',
             education: [{ year: '', level: '', school: '', qualification: '' }],
             work: [{ title: '', company: '', period: '', description: '' }],
@@ -89,6 +631,12 @@ class CVFormManager {
         this.bindAddButtons();
         // Initialize skills selector
         this.initSkillsSelector();
+        // Initialize manual skills input
+        this.initManualSkillsInput();
+        // Initialize phone handler
+        this.initPhoneHandler();
+        // Initialize address handler
+        this.initAddressHandler();
         // Load fake data initially
         this.loadFakeData();
         // Ensure at least one education row exists after loading data
@@ -146,7 +694,6 @@ class CVFormManager {
         });
 
         skillsContainer.style.display = 'block';
-        this.updateSelectedSkillsDisplay();
     }
 
     handleSkillToggle(skill, isChecked) {
@@ -158,62 +705,43 @@ class CVFormManager {
             this.selectedSkills = this.selectedSkills.filter(s => s !== skill);
         }
         
-        this.data.skills = [...this.selectedSkills];
-        this.updateSelectedSkillsDisplay();
-        
-        if (window.previewManager) {
-            window.previewManager.updatePreview();
-        }
+        this.updateSkillsData();
     }
 
-    updateSelectedSkillsDisplay() {
-        const displayContainer = document.getElementById('cv-selected-skills-display');
-        const skillsList = document.getElementById('cv-selected-skills-list');
+    // Update skills data from both checkboxes and manual input
+    updateSkillsData() {
+        const manualInput = document.getElementById('cv-skills-manual');
+        let allSkills = [...this.selectedSkills];
         
-        if (!displayContainer || !skillsList) return;
-
-        if (this.selectedSkills.length === 0) {
-            displayContainer.style.display = 'none';
-            return;
-        }
-
-        displayContainer.style.display = 'block';
-        skillsList.innerHTML = '';
-        
-        this.selectedSkills.forEach(skill => {
-            const skillTag = document.createElement('span');
-            skillTag.className = 'selected-skill-tag';
-            skillTag.textContent = skill;
-            
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.className = 'remove-skill-btn';
-            removeBtn.innerHTML = '×';
-            removeBtn.setAttribute('aria-label', `Remove ${skill}`);
-            removeBtn.addEventListener('click', () => {
-                this.removeSkill(skill);
+        // Add manually entered skills
+        if (manualInput && manualInput.value.trim()) {
+            const manualSkills = manualInput.value
+                .split(',')
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+            // Merge with checkbox skills, avoiding duplicates
+            manualSkills.forEach(skill => {
+                if (!allSkills.includes(skill)) {
+                    allSkills.push(skill);
+                }
             });
-            
-            skillTag.appendChild(removeBtn);
-            skillsList.appendChild(skillTag);
-        });
-    }
-
-    removeSkill(skill) {
-        this.selectedSkills = this.selectedSkills.filter(s => s !== skill);
-        this.data.skills = [...this.selectedSkills];
-        
-        // Uncheck the checkbox if it exists
-        const checkbox = document.querySelector(`#cv-skills-checkboxes input[value="${skill}"]`);
-        if (checkbox) {
-            checkbox.checked = false;
         }
         
-        this.updateSelectedSkillsDisplay();
+        this.data.skills = allSkills;
         
         if (window.previewManager) {
             window.previewManager.updatePreview();
         }
+    }
+
+    // Initialize manual skills input
+    initManualSkillsInput() {
+        const manualInput = document.getElementById('cv-skills-manual');
+        if (!manualInput) return;
+
+        manualInput.addEventListener('input', () => {
+            this.updateSkillsData();
+        });
     }
 
     ensureEducationRow() {
@@ -229,8 +757,12 @@ class CVFormManager {
             name: 'John Banda',
             email: 'john.banda@email.com',
             phone: '+123 456 7890',
-            address: '123 Main St, City, Country',
-            website: 'www.johnbanda.com',
+            address: {
+                country: 'Zambia',
+                state: 'Lusaka',
+                city: 'Lusaka',
+                street: '123 Main Street'
+            },
             summary: 'Motivated IT specialist with 4+ years of experience in software development and system administration. Proven track record of delivering high-quality solutions and leading cross-functional teams.',
             education: [
                 { year: '2015-2017', level: 'Tertiary', school: 'Rockview University', qualification: 'Diploma in Computer Science' },
@@ -273,20 +805,83 @@ class CVFormManager {
         Object.keys(fakeData).forEach(key => {
             if (key === 'name') document.getElementById('cv-name').value = fakeData[key];
             else if (key === 'email') document.getElementById('cv-email').value = fakeData[key];
-            else if (key === 'phone') document.getElementById('cv-phone').value = fakeData[key];
-            else if (key === 'address') document.getElementById('cv-address').value = fakeData[key];
-            else if (key === 'website') document.getElementById('cv-website').value = fakeData[key];
+            else if (key === 'phone') {
+                // Parse fake phone data (e.g., "+123 456 7890" -> country code +1, number "234567890")
+                const phoneValue = fakeData[key];
+                if (phoneValue && phoneValue.startsWith('+')) {
+                    const match = phoneValue.match(/^(\+\d+)\s*(.+)$/);
+                    if (match) {
+                        const countryCode = match[1];
+                        const phoneNumber = match[2].replace(/\s/g, '');
+                        const hiddenCountryInput = document.getElementById('cv-country-code');
+                        const searchInput = document.getElementById('cv-country-code-search');
+                        const phoneInput = document.getElementById('cv-phone-number');
+                        
+                        // Find country name from code
+                        if (typeof COUNTRY_CODES !== 'undefined') {
+                            const country = COUNTRY_CODES.find(c => c.code === countryCode);
+                            if (country && searchInput) {
+                                searchInput.value = `${country.country} (${countryCode})`;
+                            }
+                        }
+                        
+                        if (hiddenCountryInput) {
+                            hiddenCountryInput.value = countryCode;
+                        }
+                        if (phoneInput) {
+                            phoneInput.value = phoneNumber;
+                        }
+                        // Update display
+                        setTimeout(() => this.updatePhoneDisplay(), 100);
+                    }
+                }
+            }
+            else if (key === 'address') {
+                // Handle structured address
+                if (typeof fakeData[key] === 'object' && fakeData[key] !== null) {
+                    const addr = fakeData[key];
+                    const countryInput = document.getElementById('cv-address-country');
+                    const countrySearch = document.getElementById('cv-address-country-search');
+                    const stateSelect = document.getElementById('cv-address-state');
+                    const cityInput = document.getElementById('cv-address-city');
+                    const streetInput = document.getElementById('cv-address-street');
+                    
+                    if (addr.country && countryInput && countrySearch) {
+                        countryInput.value = addr.country;
+                        countrySearch.value = addr.country;
+                        this.updateAddressStateDropdown(addr.country);
+                    }
+                    if (addr.state && stateSelect) {
+                        stateSelect.value = addr.state;
+                    }
+                    if (addr.city && cityInput) {
+                        cityInput.value = addr.city;
+                    }
+                    if (addr.street && streetInput) {
+                        streetInput.value = addr.street;
+                    }
+                    this.updateAddressData();
+                } else if (typeof fakeData[key] === 'string') {
+                    // Legacy: handle old string format
+                    const cityInput = document.getElementById('cv-address-city');
+                    if (cityInput) {
+                        cityInput.value = fakeData[key];
+                        this.updateAddressData();
+                    }
+                }
+            }
             else if (key === 'summary') document.getElementById('cv-summary').value = fakeData[key];
             else if (key === 'skills') {
                 // Handle skills array - set IT industry and select skills
                 this.selectedSkills = [...fakeData[key]];
-                this.data.skills = [...fakeData[key]];
                 const industrySelect = document.getElementById('cv-industry-select');
                 if (industrySelect) {
                     industrySelect.value = 'it';
                     this.selectedIndustry = 'it';
                     this.loadSkillsForIndustry('it');
                 }
+                // Update skills data (will merge checkbox and manual skills)
+                this.updateSkillsData();
             }
             else if (Array.isArray(fakeData[key])) {
                 this.populateArrayField(key, fakeData[key]);
@@ -314,8 +909,8 @@ class CVFormManager {
     }
 
     bindInputs() {
-        // Single field inputs (skills is now handled separately)
-        const singleFields = ['name', 'email', 'phone', 'address', 'website', 'summary'];
+        // Single field inputs (phone, address, and skills are now handled separately)
+        const singleFields = ['name', 'email', 'summary'];
         singleFields.forEach(field => {
             const element = document.getElementById(`cv-${field}`);
             if (element) {
@@ -327,6 +922,9 @@ class CVFormManager {
                 });
             }
         });
+        
+        // Phone is handled by initPhoneHandler() - the hidden field is updated there
+        // Address is handled by initAddressHandler() - structured address data
 
         // Array field inputs - use event delegation
         const cvSection = document.getElementById('cv-section');

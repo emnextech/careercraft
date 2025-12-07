@@ -328,10 +328,14 @@ class UXEnhancements {
     showEmptyState(container) {
         if (container.querySelector('.section-empty-state')) return;
 
-        const emptyState = document.createElement('div');
-        emptyState.className = 'section-empty-state';
         const docType = this.documentType;
         const fieldName = container.id.replace(`${docType}-`, '').replace('-container', '');
+        
+        // Don't show empty state for skills section (users can type manually)
+        if (fieldName === 'skills') return;
+
+        const emptyState = document.createElement('div');
+        emptyState.className = 'section-empty-state';
         emptyState.innerHTML = `
             <div class="empty-state-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
