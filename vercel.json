@@ -6,10 +6,6 @@
   "installCommand": null,
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/index.html"
-    },
-    {
       "source": "/cvbuilder",
       "destination": "/mainBuilder.html"
     },
