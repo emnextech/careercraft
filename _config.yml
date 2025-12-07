@@ -1,0 +1,23 @@
+# Jekyll configuration for GitHub Pages
+title: CareerCraft
+description: Professional CV Builder - Create Your Perfect Resume
+url: https://emnextech.github.io
+baseurl: /careercraft
+
+# Jekyll settings
+# GitHub Pages uses safe mode, so custom plugins won't work
+# Using 404.html for client-side routing instead
+plugins: []
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - node_modules
+  - .git
+  - .gitignore
+  - package.json
+  - package-lock.json
+
+# Build settings
+markdown: kramdown
+highlighter: rouge

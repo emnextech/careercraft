@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerCraft - Redirecting...</title>
+    <script>
+        // GitHub Pages 404.html routing for clean URLs
+        (function() {
+            const path = window.location.pathname;
+            const search = window.location.search;
+            const hash = window.location.hash;
+            
+            // Get base path (for GitHub Pages with repository name)
+            const basePath = '/careercraft';
+            
+            // Handle root path or index
+            if (path === '/' || path === basePath + '/' || path === basePath || path.endsWith('/index.html')) {
+                window.location.replace(basePath + '/index.html' + search + hash);
+                return;
+            }
+            
+            // Handle /cvbuilder path (with or without base path)
+            if (path === '/cvbuilder' || path === basePath + '/cvbuilder' || path === '/cvbuilder/' || path === basePath + '/cvbuilder/') {
+                window.location.replace(basePath + '/mainBuilder.html' + search + hash);
+                return;
+            }
+            
+            // Handle /cvbuilder/ path with additional paths
+            if (path.startsWith('/cvbuilder/') || path.startsWith(basePath + '/cvbuilder/')) {
+                const params = path.split('/cvbuilder/')[1] || '';
+                window.location.replace(basePath + '/mainBuilder.html?' + params + (search ? '&' + search.substring(1) : '') + hash);
+                return;
+            }
+            
+            // If no match, redirect to home
+            window.location.replace(basePath + '/index.html');
+        })();
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: #F1F5F9;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
