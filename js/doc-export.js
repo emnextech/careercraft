@@ -36,16 +36,36 @@ class DOCXExporter {
                 if (typeof docx !== 'undefined') {
                     await this.createDOCXWithLibrary(previewContent, finalFileName, paperSize, settings);
                     return;
+                } else {
+                    console.warn('DOCX library not loaded. Please ensure docx library is available.');
+                    throw new Error('DOCX library not available');
                 }
             } catch (libraryError) {
-                console.warn('DOCX library not available or error:', libraryError);
+                console.error('DOCX library error:', libraryError);
+                // Only fallback if library is truly unavailable, not if there's a data error
+                if (libraryError.message && libraryError.message.includes('CV data not available')) {
+                    throw libraryError; // Re-throw data errors
+                }
             }
 
-            // Fallback to simple HTML method
+            // Fallback to simple HTML method (creates .doc file, not .docx - limited mobile support)
+            console.warn('Falling back to HTML-based export. This creates a .doc file which may not work on all mobile devices.');
             this.createSimpleDOCX(previewContent, finalFileName, paperSize, settings);
         } catch (error) {
             console.error('DOCX Export Error:', error);
-            alert('Error generating DOCX. Using fallback method.');
+            // Only use fallback if it's not a critical error
+            if (error.message && error.message.includes('CV data not available')) {
+                alert('Error: CV data is not available. Please fill in your CV information first.');
+                return;
+            }
+            // Try fallback only if library method failed
+            if (typeof docx !== 'undefined') {
+                alert('Error generating DOCX. Please try again. If the problem persists, refresh the page.');
+                return;
+            }
+            // Last resort: fallback to HTML method
+            console.warn('Using HTML fallback method (creates .doc file, limited mobile support)');
+            alert('Note: Using fallback export method. The file may not open on all mobile devices.');
             const fallbackFileName = 'CV.docx';
             const previewContent = document.getElementById('preview-content');
             const settings = previewContent ? this.getPreviewSettings(previewContent) : null;
@@ -922,12 +942,17 @@ class DOCXExporter {
             }]
         });
 
-        // Generate and download
+        // Generate and download with proper MIME type for mobile compatibility
         const blob = await Packer.toBlob(doc);
+        // Create a new blob with explicit MIME type for mobile compatibility
+        const docxBlob = new Blob([blob], { 
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+        });
+
         if (typeof saveAs !== 'undefined') {
-            saveAs(blob, fileName);
+            saveAs(docxBlob, fileName);
         } else {
-            this.downloadBlob(blob, fileName);
+            this.downloadBlob(docxBlob, fileName);
         }
     }
 
@@ -1303,14 +1328,26 @@ ${content.innerHTML}
 
 
     downloadBlob(blob, fileName) {
+        // Ensure proper MIME type for DOCX files
+        if (fileName.endsWith('.docx') && blob.type !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            blob = new Blob([blob], { 
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+            });
+        }
+        
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
         link.download = fileName;
+        link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+        
+        // Clean up after a delay to ensure download starts on mobile
+        setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }, 100);
     }
 
     addInlineStyles(element, paperSize = 'a4', settings = null) {
