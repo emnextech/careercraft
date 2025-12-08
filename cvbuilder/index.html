@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=../mainBuilder.html">
+    <meta http-equiv="refresh" content="0; url=/cvbuilder">
     <script>
-        window.location.href = '../mainBuilder.html' + window.location.search + window.location.hash;
+        // Redirect to /cvbuilder preserving query parameters and hash
+        const query = window.location.search;
+        const hash = window.location.hash;
+        window.location.replace('/cvbuilder' + query + hash);
     </script>
 </head>
 <body>
-    <p>Redirecting to CV Builder... <a href="../mainBuilder.html">Click here if not redirected</a></p>
+    <p>Redirecting to CV Builder... <a href="/cvbuilder">Click here if not redirected</a></p>
 </body>
 </html>

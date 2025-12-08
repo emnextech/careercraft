@@ -10,7 +10,7 @@
       "destination": "/mainBuilder.html"
     },
     {
-      "source": "/cvbuilder/(.*)",
+      "source": "/cvbuilder/:path*",
       "destination": "/mainBuilder.html"
     }
   ],
@@ -18,11 +18,6 @@
     {
       "source": "/index.html",
       "destination": "/",
-      "permanent": true
-    },
-    {
-      "source": "/mainBuilder.html",
-      "destination": "/cvbuilder",
       "permanent": true
     }
   ],

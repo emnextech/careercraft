@@ -48,6 +48,11 @@
     <meta name="format-detection" content="telephone=no">
     
     <link rel="stylesheet" href="styles/base.css">
+    <!-- Ad Script -->
+    <script
+      type="text/javascript"
+      src="//pl28218214.effectivegatecpm.com/a7/91/ba/a791ba44f331f3ab1408d83610d095f2.js"
+    ></script>
     <style>
         * {
             margin: 0;
@@ -904,6 +909,85 @@
                 gap: 30px;
             }
         }
+
+        /* Ad Container Styles */
+        .ad-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ad-container > div {
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ad-container iframe,
+        .ad-container div[id*="ad"],
+        .ad-container div[id*="SocialBar"],
+        .ad-container div[class*="ad"],
+        .ad-container ins {
+            max-width: 100% !important;
+            width: 100% !important;
+            margin: 0 auto;
+            display: block;
+            position: relative !important;
+            z-index: 1;
+        }
+
+        /* Prevent ads from using fixed positioning that could interfere */
+        .ad-container * {
+            position: relative !important;
+        }
+
+        .ad-container iframe[style*="position: fixed"],
+        .ad-container div[style*="position: fixed"] {
+            position: relative !important;
+        }
+
+        .ad-label {
+            text-align: center;
+            font-size: 0.75em;
+            color: #94A3B8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Responsive ad containers */
+        @media (max-width: 768px) {
+            .ad-container {
+                margin: 30px auto;
+                padding: 0 15px;
+                min-height: 80px;
+            }
+
+            .ad-container iframe,
+            .ad-container div[id*="ad"],
+            .ad-container div[id*="SocialBar"],
+            .ad-container div[class*="ad"] {
+                max-height: 250px !important;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .ad-container iframe,
+            .ad-container div[id*="ad"],
+            .ad-container div[id*="SocialBar"],
+            .ad-container div[class*="ad"] {
+                max-height: 300px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -950,9 +1034,17 @@
             <p class="subtitle">Stand out from the crowd with professional, ATS-friendly templates. No design skills needed—just your experience and our expertise.</p>
             
             <div class="hero-buttons">
-                <a href="mainBuilder.html?type=cv" class="hero-button hero-button-cv" data-type="cv">
+                <a href="/cvbuilder?type=cv" class="hero-button hero-button-cv" data-type="cv">
                     Start Building Your CV
                 </a>
+            </div>
+        </div>
+
+        <!-- Ad Container 1 -->
+        <div class="ad-container">
+            <div>
+                <div class="ad-label">Advertisement</div>
+                <div id="SocialBar_1"></div>
             </div>
         </div>
 
@@ -997,6 +1089,14 @@
             </div>
         </section>
 
+        <!-- Ad Container 2 -->
+        <div class="ad-container">
+            <div>
+                <div class="ad-label">Advertisement</div>
+                <div id="SocialBar"></div>
+            </div>
+        </div>
+
         <!-- Features Section -->
         <section id="features-section" class="features-section">
             <div id="templates" class="feature-item">
@@ -1034,6 +1134,14 @@
                 <p>Customize your CV with ease. Change colors from 8 professional color schemes, select from multiple font options, and switch between templates instantly. All changes are reflected in real-time, so you can see exactly how your CV will look before exporting.</p>
             </div>
         </section>
+
+        <!-- Ad Container 3 (Footer Area) -->
+        <div class="ad-container" style="margin-top: 60px; margin-bottom: 20px;">
+            <div>
+                <div class="ad-label">Advertisement</div>
+                <div id="SocialBar_Footer"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -1090,11 +1198,62 @@
     </div>
 
     <script>
+        // Ad container management - ensure ads don't break layout
+        (function() {
+            function manageAdContainers() {
+                const adContainers = document.querySelectorAll('.ad-container');
+                adContainers.forEach(container => {
+                    const adElement = container.querySelector('div[id*="ad"], div[class*="ad"], iframe, ins');
+                    if (adElement) {
+                        // Ensure ads don't overflow
+                        adElement.style.maxWidth = '100%';
+                        adElement.style.width = '100%';
+                        
+                        // Set max height to prevent ads from being too tall
+                        const maxHeight = window.innerWidth <= 768 ? '250px' : '300px';
+                        adElement.style.maxHeight = maxHeight;
+                        adElement.style.overflow = 'hidden';
+                    }
+                });
+            }
+
+            // Run on load and after a delay to catch dynamically loaded ads
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    manageAdContainers();
+                    setTimeout(manageAdContainers, 2000);
+                    setTimeout(manageAdContainers, 5000);
+                });
+            } else {
+                manageAdContainers();
+                setTimeout(manageAdContainers, 2000);
+                setTimeout(manageAdContainers, 5000);
+            }
+
+            // Monitor for dynamically added ad elements
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length) {
+                        manageAdContainers();
+                    }
+                });
+            });
+
+            // Observe ad containers for changes
+            document.querySelectorAll('.ad-container').forEach(container => {
+                observer.observe(container, { childList: true, subtree: true });
+            });
+        })();
+
         // Smooth transition when navigating to builder with shimmer effect
         document.querySelectorAll('.hero-button').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-                const href = this.getAttribute('href');
+                let href = this.getAttribute('href');
+                // Ensure absolute path for Vercel routing
+                if (!href.startsWith('http') && !href.startsWith('/')) {
+                    href = '/' + href;
+                }
                 const shimmerOverlay = document.getElementById('shimmerOverlay');
                 
                 // Show shimmer overlay
